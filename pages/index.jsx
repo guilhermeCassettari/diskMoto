@@ -15,13 +15,23 @@ export default function Home() {
   const [houseNumber, setHousenumber] = useState('')
   const [adress, setAdress] = useState()
 
+  //navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, maximumAge:30000, timeout:27000});
+
+  const geoSuccess = (position) => {
+    setLatitude(position.coords.latitude)
+    setLongitude(position.coords.longitude)
+  }
+
+  const geoError = () => {
+    console.log(error)
+  }
+
+
+  //  navigator.geolocation.watchPosition(function (position) { 
   const getLatLong = async () => {
     if (latitude == '' && longitude == '') {
       if ("geolocation" in navigator) {
-          navigator.geolocation.watchPosition(function (position) {
-          setLatitude(position.coords.latitude)
-          setLongitude(position.coords.longitude)
-        })
+        navigator.geolocation.watchPosition(geoSuccess, geoError, {enableHighAccuracy:true, maximumAge:30000, timeout:27000});        
       }
     } else {
       axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`).then(res => {
