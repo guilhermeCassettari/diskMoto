@@ -10,50 +10,46 @@ export default function Home() {
 
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
-  const [adress, setAdress] = useState({})
+  const [adress, setAdress] = useState()
 
-  const getLatLongAndAress = async () => {
-
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        setLatitude(position.coords.latitude)
-        setLongitude(position.coords.longitude)
-        setAdress(axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.longitude},${position.coords.latitude}&key=${apiKey}`).catch((error) => console.log(error)))
-      })
+  const getLatLong = async () => {
+    if (latitude == '' && longitude == '') {
+      if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+          setLatitude(position.coords.latitude)
+          setLongitude(position.coords.longitude)
+        })
+      }
     } else {
-      setLatitude('false')
-      setLatitude('false')
+      axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`).then(res => {
+        setAdress(res)
+        console.log(res.data.results[0].formatted_address)
+    }).catch((error) => console.log(error))
+      
     }
-
-
   }
+  useEffect(() => {
+    getLatLong()
 
-
-
-
-
-  useEffect( () => {
-    getLatLongAndAress()
-
-    
-  }, [])
+  }, [ longitude])
+  const clickou = () => console.log(adress)
   return (
 
-
+    
     <>
+    
 
       <div className={styles.container}>
         <h1>Longitude {longitude} Latitude {latitude}</h1>
         <input type="text" name="Nome" />
-        <h1>Numero Celular</h1>
+        <h1></h1>
         <input type="text" name="telefone" />
-        <h1>Endereço {console.log(adress)}</h1>
+        <h1>{ adress ?  adress.data.results[0].formatted_address: 'nops'} </h1>
         <input type="text" name="endereco" />
         <h1>Numero da casa</h1>
-        <input type="number" name="numero" />
+        <input type="tel" name="numero" />
         <h1>Destino</h1>
-        <input type="text" name="destino" />
+        <input type="text" name="destino" onClick={clickou}/>
       </div>
     </>
   )
